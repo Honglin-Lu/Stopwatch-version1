@@ -1,0 +1,78 @@
+@font-face {
+    font-family: myFont;
+    src: url(FontsFree-Net-SFProText-Light-1.ttf);
+}
+
+.iPhone{
+    width: 390px;
+    height: 844px;
+    background-color: #020003;
+    padding: 15px;
+    color: #fefdff;
+}
+
+.timer{
+    margin-top: 100px;
+    text-align: center;
+    color:#fefdff;
+    font-size: 80px;
+    font-family: myFont;
+    font-variant-numeric: tabular-nums;
+}
+
+.buttons{
+    display: flex;
+    color: #fefdff;
+    justify-content: space-between;
+    align-items: baseline;
+}
+
+.buttons button{
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 2px solid black;
+}
+
+.buttons span{
+    font-size: 80px;
+    font-weight: 100;
+    font-family: myFont;
+}
+
+.dot-right{
+    color: #49494c;
+}
+
+.btn-start{
+    color: #3db85d;
+    background-color: #0b2a14;
+    outline: #0b2a14 solid 2px;
+}
+
+.btn-stop{
+    display: none;
+    color: #d43b36;
+    background-color: #350e0e;
+    outline: #350e0e solid 2px;
+}
+
+
+.btn-lap{
+    color: #fefdff;
+    background-color:#1f1c22;
+    outline: #1f1c22 solid 2px;
+
+}
+.lap-records ul{
+    padding-left: 0;
+    border-top: 1px solid #242024;
+}
+.lap-records li{
+    list-style: none;
+    border-bottom: 1px solid #242024;
+    line-height: 40px;
+    font-family: myFont;
+    display: flex;
+    justify-content: space-between;
+}
