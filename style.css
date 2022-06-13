@@ -3,12 +3,13 @@
     src: url(FontsFree-Net-SFProText-Light-1.ttf);
 }
 
-.iPhone{
+.iPhone-container{
     width: 390px;
     height: 844px;
     background-color: #020003;
     padding: 15px;
     color: #fefdff;
+    margin: 0 auto;
 }
 
 .timer{
@@ -62,9 +63,15 @@
     color: #fefdff;
     background-color:#1f1c22;
     outline: #1f1c22 solid 2px;
-
 }
-.lap-records ul{
+
+.btn-reset{
+    display: none;
+    color: #fefdff;
+    background-color:#1f1c22;
+    outline: #1f1c22 solid 2px;
+}
+.lap-records {
     padding-left: 0;
     border-top: 1px solid #242024;
 }
@@ -75,4 +82,6 @@
     font-family: myFont;
     display: flex;
     justify-content: space-between;
+    font-variant-numeric: tabular-nums;
+
 }
