@@ -22,6 +22,7 @@ Main business functionalities
     Reset timer.
     Lap records are all removed.
 */
+
 const timer = document.querySelector(".timer");
 const startButton = document.querySelector(".btn-start");
 const stopButton = document.querySelector(".btn-stop");
@@ -32,15 +33,15 @@ const lapRecords = document.querySelector(".lap-records");
 let [timerMinutes, timerSeconds, timerCentiseconds] = [0, 0, 0];
 let [lapMinutes, lapSeconds, lapCentiseconds] = [0, 0, 0];
 
-let li = null;
-let lapTitleSpan = null;
-let lapTimeSpan = null;
+let $oneLapRecord = null;
+let $lapTitle = null;
+let $lapTime = null;
 let counter = 1; // to make the Lap title. (eg. Lap 2)
 let lapTimes = []; // change each lap time to centiseconds then put all integers in this array
 let [maxIndex, minIndex] = [-1, -1]; //the index of max lapTime and min lapTime in the array lapTimes
 
-let maxLapLi = null;
-let minLapLi = null;
+let $maxLap = null;
+let $minLap = null;
 
 
 const resetTimer = () => {
@@ -48,17 +49,18 @@ const resetTimer = () => {
     [timerMinutes, timerSeconds, timerCentiseconds] = [0, 0, 0];
 }
 
-const calculateTime = (min, sec, cisec) => {
-    cisec = cisec + 1;
-    if (cisec >= 100) {
+
+const calculateTime = (min, sec, ciSec) => {
+    ciSec = ciSec + 1;
+    if (ciSec >= 100) {
         sec++;
-        cisec = cisec - 100;
+        ciSec = ciSec - 100;
     }
     if (sec >= 60){
         min++;
         sec = sec - 60;
     }
-    return [min, sec, cisec];
+    return [min, sec, ciSec];
     
 }
 
@@ -70,40 +72,43 @@ const displayTimer = () => {
 
 const displayLapTime = () => {
     [lapMinutes, lapSeconds, lapCentiseconds] = calculateTime(lapMinutes, lapSeconds, lapCentiseconds);
-    lapTimeSpan.innerHTML = lapMinutes.toString().padStart(2, '0') + ':' + lapSeconds.toString().padStart(2, '0') 
+    $lapTime.innerHTML = lapMinutes.toString().padStart(2, '0') + ':' + lapSeconds.toString().padStart(2, '0') 
     + '.' + lapCentiseconds.toString().padStart(2, '0');   
     
 }
 
 const createLiElement = () => {
-    li = document.createElement("li");
-    li.setAttribute('id', counter)
-    lapTitleSpan = document.createElement("span");
-    lapTimeSpan = document.createElement("span");
-    lapRecords.prepend(li);
-    li.appendChild(lapTitleSpan);
-    li.appendChild(lapTimeSpan);
-    lapTitleSpan.innerHTML = 'Lap ' + counter;
+    $oneLapRecord = document.createElement("li");
+    $oneLapRecord.setAttribute('id', counter)
+    $lapTitle = document.createElement("span");
+    $lapTime = document.createElement("span");
+    lapRecords.prepend($oneLapRecord);
+    $oneLapRecord.appendChild($lapTitle);
+    $oneLapRecord.appendChild($lapTime);
+    $lapTitle.innerHTML = 'Lap ' + counter;
 }
 
 let timerIntervalInstance = null;
 let lapIntervalInstance = null;
-startButton.addEventListener('click', () => {
-    if (timerMinutes == 0 && timerSeconds == 0 && timerCentiseconds == 0){
+
+const onStart = () => {
+    if (timerMinutes == 0 && timerSeconds == 0 && timerCentiseconds == 0) {
         createLiElement();
     }
     timerIntervalInstance = setInterval(displayTimer, 10);
     lapIntervalInstance = setInterval(displayLapTime, 10);
-    
-    startButton.style.display = "none"
+
+    startButton.style.display = "none";
     stopButton.style.display = "block";
 
     lapButton.style.display = "block";
-    resetButton.style.display = "none";   
-})
+    resetButton.style.display = "none";
+};
 
+startButton.addEventListener('click', onStart)
 
-stopButton.addEventListener('click', () => { 
+const onStop = () => {
+     
     clearInterval(timerIntervalInstance);
     clearInterval(lapIntervalInstance);
 
@@ -113,9 +118,12 @@ stopButton.addEventListener('click', () => {
     resetButton.style.display = "block";
     lapButton.style.display = "none";
     
-})
 
-resetButton.addEventListener('click', () => {
+}
+
+stopButton.addEventListener('click', onStop)
+
+const onReset = () => {
     resetTimer();
     lapRecords.innerHTML = "";
     counter = 1;
@@ -123,7 +131,9 @@ resetButton.addEventListener('click', () => {
     lapTimes = [];
     lapButton.style.display = "block";
     resetButton.style.display = "none";
-})
+}
+
+resetButton.addEventListener('click', onReset)
 
 const changeLapTimeToCentiseconds = (lapMinutes, lapSeconds, lapCentiseconds) => {
     return lapMinutes * 60 * 100 + lapSeconds * 100 + lapCentiseconds
@@ -138,20 +148,19 @@ const compareLapTime = (lapTimes) => {
 }
 
 const displayMaxMinLapTime = (maxIndex, minIndex) => {
-    maxLapLi = document.getElementById(maxIndex + 1);
-    minLapLi = document.getElementById(minIndex + 1);
-    maxLapLi.style.color = '#d43b36';
-    minLapLi.style.color = '#3db85d';
+    $maxLap = document.getElementById(maxIndex + 1);
+    $minLap = document.getElementById(minIndex + 1);
+    $maxLap.style.color = '#d43b36';
+    $minLap.style.color = '#3db85d';
 }
 
-
-lapButton.addEventListener('click', () => {
+const onLap = () => {
     let lapTime = changeLapTimeToCentiseconds(lapMinutes, lapSeconds, lapCentiseconds);
     lapTimes.push(lapTime);
     if(lapTimes.length >= 2){
-        if (maxLapLi && minLapLi){
-            maxLapLi.style.color = '#fefdff';
-            minLapLi.style.color = '#fefdff';
+        if ($maxLap && $minLap){
+            $maxLap.style.color = '#fefdff';
+            $minLap.style.color = '#fefdff';
         }
         [maxIndex, minIndex] = compareLapTime(lapTimes);
         displayMaxMinLapTime(maxIndex, minIndex);
@@ -161,5 +170,6 @@ lapButton.addEventListener('click', () => {
     clearInterval(lapIntervalInstance);
     createLiElement();
     lapIntervalInstance = setInterval(displayLapTime, 10);
+}
 
-})
+lapButton.addEventListener('click', onLap)
