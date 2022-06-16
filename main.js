@@ -22,6 +22,7 @@ Main business functionalities
     Reset timer.
     Lap records are all removed.
 */
+import { calculateTime } from "./utility.js";
 
 const timer = document.querySelector(".timer");
 const startButton = document.querySelector(".btn-start");
@@ -50,19 +51,6 @@ const resetTimer = () => {
 }
 
 
-const calculateTime = (min, sec, ciSec) => {
-    ciSec = ciSec + 1;
-    if (ciSec >= 100) {
-        sec++;
-        ciSec = ciSec - 100;
-    }
-    if (sec >= 60){
-        min++;
-        sec = sec - 60;
-    }
-    return [min, sec, ciSec];
-    
-}
 
 const displayTimer = () => {
     [timerMinutes, timerSeconds, timerCentiseconds] = calculateTime(timerMinutes, timerSeconds, timerCentiseconds);
@@ -92,6 +80,7 @@ let timerIntervalInstance = null;
 let lapIntervalInstance = null;
 
 const onStart = () => {
+
     if (timerMinutes == 0 && timerSeconds == 0 && timerCentiseconds == 0) {
         createLiElement();
     }
