@@ -22,7 +22,7 @@ Main business functionalities
     Reset timer.
     Lap records are all removed.
 */
-import { calculateTime } from "./utility.js";
+import { displayTime } from "./utils.js";
 
 const timer = document.querySelector(".timer");
 const startButton = document.querySelector(".btn-start");
@@ -31,8 +31,8 @@ const lapButton = document.querySelector(".btn-lap");
 const resetButton = document.querySelector(".btn-reset");
 const lapRecords = document.querySelector(".lap-records");
 
-let [timerMinutes, timerSeconds, timerCentiseconds] = [0, 0, 0];
-let [lapMinutes, lapSeconds, lapCentiseconds] = [0, 0, 0];
+let startTime, lapStartTime, lapTime;
+let elapsedTime = 0;
 
 let $oneLapRecord = null;
 let $lapTitle = null;
@@ -43,27 +43,6 @@ let [maxIndex, minIndex] = [-1, -1]; //the index of max lapTime and min lapTime 
 
 let $maxLap = null;
 let $minLap = null;
-
-
-const resetTimer = () => {
-    timer.innerHTML = '00:00.00';
-    [timerMinutes, timerSeconds, timerCentiseconds] = [0, 0, 0];
-}
-
-
-
-const displayTimer = () => {
-    [timerMinutes, timerSeconds, timerCentiseconds] = calculateTime(timerMinutes, timerSeconds, timerCentiseconds);
-    timer.innerHTML = timerMinutes.toString().padStart(2, '0') + ':' + timerSeconds.toString().padStart(2, '0') 
-                        + '.' + timerCentiseconds.toString().padStart(2, '0');   
-}
-
-const displayLapTime = () => {
-    [lapMinutes, lapSeconds, lapCentiseconds] = calculateTime(lapMinutes, lapSeconds, lapCentiseconds);
-    $lapTime.innerHTML = lapMinutes.toString().padStart(2, '0') + ':' + lapSeconds.toString().padStart(2, '0') 
-    + '.' + lapCentiseconds.toString().padStart(2, '0');   
-    
-}
 
 const createLiElement = () => {
     $oneLapRecord = document.createElement("li");
@@ -80,12 +59,22 @@ let timerIntervalInstance = null;
 let lapIntervalInstance = null;
 
 const onStart = () => {
+    
+    startTime = Date.now();
 
-    if (timerMinutes == 0 && timerSeconds == 0 && timerCentiseconds == 0) {
+    if (elapsedTime == 0) {
         createLiElement();
     }
-    timerIntervalInstance = setInterval(displayTimer, 10);
-    lapIntervalInstance = setInterval(displayLapTime, 10);
+    timerIntervalInstance = setInterval( () => {
+        let timerElapsedTime = Date.now() - startTime;
+        timer.innerHTML = displayTime(timerElapsedTime + elapsedTime);
+    }, 10);
+
+    lapIntervalInstance = setInterval( () => {
+        let lapElapsedTime = Date.now() - startTime;
+        $lapTime.innerHTML = displayTime(lapElapsedTime + elapsedTime);
+        lapTime = lapElapsedTime + elapsedTime;
+    }, 10);
 
     startButton.style.display = "none";
     stopButton.style.display = "block";
@@ -97,7 +86,8 @@ const onStart = () => {
 startButton.addEventListener('click', onStart)
 
 const onStop = () => {
-     
+    elapsedTime = Date.now() - startTime;
+    
     clearInterval(timerIntervalInstance);
     clearInterval(lapIntervalInstance);
 
@@ -107,26 +97,21 @@ const onStop = () => {
     resetButton.style.display = "block";
     lapButton.style.display = "none";
     
-
 }
 
 stopButton.addEventListener('click', onStop)
 
 const onReset = () => {
-    resetTimer();
+    elapsedTime = 0;
+    timer.innerHTML = displayTime(0);
     lapRecords.innerHTML = "";
     counter = 1;
-    [lapMinutes, lapSeconds, lapCentiseconds] = [0, 0, 0];
     lapTimes = [];
     lapButton.style.display = "block";
     resetButton.style.display = "none";
 }
 
 resetButton.addEventListener('click', onReset)
-
-const changeLapTimeToCentiseconds = (lapMinutes, lapSeconds, lapCentiseconds) => {
-    return lapMinutes * 60 * 100 + lapSeconds * 100 + lapCentiseconds
-}
 
 
 const compareLapTime = (lapTimes) => {
@@ -144,7 +129,8 @@ const displayMaxMinLapTime = (maxIndex, minIndex) => {
 }
 
 const onLap = () => {
-    let lapTime = changeLapTimeToCentiseconds(lapMinutes, lapSeconds, lapCentiseconds);
+    clearInterval(lapIntervalInstance);
+    console.log(lapTime);
     lapTimes.push(lapTime);
     if(lapTimes.length >= 2){
         if ($maxLap && $minLap){
@@ -154,11 +140,14 @@ const onLap = () => {
         [maxIndex, minIndex] = compareLapTime(lapTimes);
         displayMaxMinLapTime(maxIndex, minIndex);
     }
+
     counter++;
-    [lapMinutes, lapSeconds, lapCentiseconds] = [0, 0, 0];
-    clearInterval(lapIntervalInstance);
     createLiElement();
-    lapIntervalInstance = setInterval(displayLapTime, 10);
+    lapStartTime = Date.now();
+    lapIntervalInstance = setInterval(() => {
+        lapTime = Date.now() - lapStartTime;
+        $lapTime.innerHTML = displayTime(lapTime);
+    }, 10);
 }
 
 lapButton.addEventListener('click', onLap)
